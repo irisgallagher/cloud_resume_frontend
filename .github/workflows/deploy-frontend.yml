@@ -7,7 +7,7 @@ on:
       - master
 
 #Deploy front end code (Define the deployment job)
-jobs: 
+jobs:
   deploy: 
     #Specify the enviornment for the job to run in 
     runs-on ubuntu-latest 
