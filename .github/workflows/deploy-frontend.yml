@@ -10,7 +10,7 @@ on:
 jobs:
   deploy: 
     #Specify the enviornment for the job to run in 
-    runs-on ubuntu-latest 
+    runs-on: ubuntu-latest 
 
     #Define steps in the job
     steps: 
@@ -18,10 +18,17 @@ jobs:
       - name: Checkout repository 
         uses: actions/checkout@v4
 
-      #Synch the files to S3. Use ${{to create a secret key within the brackets}} 
-      - name: Synch files to S3
-        run: aws s3 synch . s3://${{ secrets.S3_BUCKET_NAME }} #--delete
+      #Sync the files to S3. Use ${{to create a secret key within the brackets}} 
+      - name: Sync files to S3
+        run: aws s3 sync . s3://${{ secrets.S3_BUCKET_NAME }} #--delete
         env: 
           AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY_ID: ${{secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS DEFAULT_REGION: us-east-1 
+          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+      #Invalidate the CloudFront cache 
+      - name: Invalidate CloudFront cache
+        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
+        env:
+          AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
